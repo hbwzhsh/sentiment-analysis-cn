@@ -1,6 +1,5 @@
 import requests
 import time
-import json
 import csv
 from http.cookies import SimpleCookie
 
@@ -27,7 +26,7 @@ headers = {
     'X-Requested-With': 'XMLHttpRequest'
 }
 
-raw_data = "cy=2311; cye=singapore; _lxsdk_cuid=164e476a159c8-0d29a955cfd024-2711938-1fa400-164e476a15ac8; _lxsdk=164e476a159c8-0d29a955cfd024-2711938-1fa400-164e476a15ac8; _hc.v=945ccfd5-f0ef-5ced-96a6-57b81e5368d1.1532841337; s_ViewType=1; dper=a74568066ab518cd86edf71992682dfc9f319a811019bd44349b10a34e92a4b03792193a4eebf2ec129b40a00e209c0d5c587ec3af3ea5226063297014c74d195a28eee62fb23182908b2431fade58572313efd53e79214f13313e81d202182c; ll=7fd06e815b796be3df069dec7836c3df; ua=dpuser_4252403616; ctu=0c4ac1d1f837a576bedf3401825fa1532dcac384129922ab18742b378372f91f; uamo=85023591; _lx_utm=utm_source%3Dgoogle%26utm_medium%3Dorganic; __mta=88340260.1532841356020.1532877176822.1532961939363.7; _lxsdk_s=%7C%7C0"
+raw_data = "cy=2311; _lxsdk_cuid=164e476a159c8-0d29a955cfd024-2711938-1fa400-164e476a15ac8; _lxsdk=164e476a159c8-0d29a955cfd024-2711938-1fa400-164e476a15ac8; _hc.v=945ccfd5-f0ef-5ced-96a6-57b81e5368d1.1532841337; s_ViewType=1; ua=dpuser_4252403616; ctu=0c4ac1d1f837a576bedf3401825fa1532dcac384129922ab18742b378372f91f; __mta=88340260.1532841356020.1532966725733.1533207768798.9; JSESSIONID=2376D714B00477B84DDBE15F56A6B3A4; _thirdu.c=cce17ce5b0b1058454459bc4e82e1b49; lgtoken=08fe9c1c8-b423-4c44-b226-f86a6fcf0845; thirdtoken=91385117C0E327C3C7653E4050175B65; dper=a74568066ab518cd86edf71992682dfcfa816ed7ed2d69cb9ad21f48efcc361f2d51b7bf4b414083dbcac3425b0cebb36cacc3cd80cfd57a853f5906324fabeb23246eae3ed28e1254ca54f9e74b9636dbe4fcdbea91d8444d02b1782a2325e9; ll=7fd06e815b796be3df069dec7836c3df; uamo=85023591; _lxsdk_s=1668764b4ed-5b9-d82-f72%7C%7C82"
 cookie = SimpleCookie()
 cookie.load(raw_data)
 
@@ -43,7 +42,7 @@ def get_reviews_from_api(shop_id):
 
     try:
         print("fetching data - " + shop_id)
-        r = requests.get(url, params = params, headers = headers, cookies = cookies)
+        r = requests.get(url, params=params, headers=headers, cookies=cookies)
         # print(r.text)
         resp = r.json()
 
@@ -51,7 +50,7 @@ def get_reviews_from_api(shop_id):
         reviews = resp["reviewDataList"]
         for review in reviews:
             restaurant_id = review["shopId"]
-            user_id = review["user_id"]
+            user_id = review["userId"]
             body = review["reviewBody"]
             star = review["star"]["value"]
             add_time = review["addTime"]
@@ -59,7 +58,7 @@ def get_reviews_from_api(shop_id):
             
         # Consolidate all the reviews into csv
         with open("reviews.csv", "a", encoding='utf-8') as csv_file:
-            writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting = csv.QUOTE_MINIMAL)
+            writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for review in review_list:
                 # print(review)
                 writer.writerow(review)
@@ -67,10 +66,10 @@ def get_reviews_from_api(shop_id):
     except Exception as e:
         print("Error in requesting from " + shop_id)
         print(e)
-        return
+        return None
 
 
-with open("restaurant-20180729.txt", "r") as restaurant_file:
+with open("data/restaurant-sg.txt", "r") as restaurant_file:
     for line in restaurant_file:
         print("Crawling start - " + line)
         parts = line.split('/')

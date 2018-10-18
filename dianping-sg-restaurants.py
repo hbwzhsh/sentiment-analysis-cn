@@ -2,16 +2,18 @@ from bs4 import BeautifulSoup
 import requests
 import time
 
-def getSoup(url):
+
+def get_soup(url):
 	r = requests.get(url)
-	html_content  = r.text
+	html_content = r.text
 	soup = BeautifulSoup(html_content, "html.parser")
 	return soup
 
-def getRestaurantURLs(url):
+
+def get_restaurant_urls(url):
 	print("Reading from " + url)
 	urls = list()
-	soup = getSoup(url)
+	soup = get_soup(url)
 	items = soup.find("div", {"id": "searchList"})
 	links = items.findAll("a", {"class": "BL"})
 	for link in links:
@@ -19,12 +21,13 @@ def getRestaurantURLs(url):
 			urls.append("http://www.dianping.com" + link["href"])
 	return urls
 
+
 baseUrl = "http://www.dianping.com/singapore/food"
 restaurantUrls = list()
-restaurantUrls.extend(getRestaurantURLs(baseUrl))
+restaurantUrls.extend(get_restaurant_urls(baseUrl))
 
-for n in range(2,51):
-	restaurantUrls.extend(getRestaurantURLs(baseUrl + '/p' + str(n)))
+for n in range(2, 51):
+	restaurantUrls.extend(get_restaurant_urls(baseUrl + '/p' + str(n)))
 	time.sleep(1)
 
 file = open("restaurant.txt", "w")
